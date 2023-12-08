@@ -14,7 +14,7 @@ class Settings(BaseSettings):
     LOG_LEVEL: str = 'INFO'
     YANDEX_WEATHER_API_KEY: str
     BASEDIR: str = os.path.join(os.path.abspath(os.path.dirname(__file__)), '..')
-    LOG_FILES_PATH: str = os.path.join(BASEDIR, 'logs')
+    LOG_FILES_PATH: str = os.path.join(BASEDIR, 'logs', 'log.txt')
 
     @property
     def DATABASE_URL(self):
