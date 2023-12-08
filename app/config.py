@@ -1,3 +1,5 @@
+import os
+
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -11,6 +13,8 @@ class Settings(BaseSettings):
     DB_TYPE: str = 'postgresql'
     LOG_LEVEL: str = 'INFO'
     YANDEX_WEATHER_API_KEY: str
+    BASEDIR: str = os.path.join(os.path.abspath(os.path.dirname(__file__)), '..')
+    LOG_FILES_PATH: str = os.path.join(BASEDIR, 'logs')
 
     @property
     def DATABASE_URL(self):
