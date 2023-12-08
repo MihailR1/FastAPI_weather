@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 
 app = FastAPI()
-
+# TODO: add dramatiq for automatic refresh weather each 5 minutes
 
 @app.get("/")
 async def root():
