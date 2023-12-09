@@ -17,9 +17,9 @@ class City(Base):
 
     name: Mapped[str] = mapped_column(sqlalchemy.String, index=True, nullable=False, unique=False)
     post_index: Mapped[int | None]
-    utc_offset: Mapped[int]
-    lat: Mapped[float]
-    lon: Mapped[float]
+    utc_offset: Mapped[str]
+    latitude: Mapped[float]
+    longitude: Mapped[float]
     population: Mapped[int | None]
     region_id: Mapped[int] = mapped_column(ForeignKey("region.id"))
     region: Mapped["Region"] = relationship(back_populates='cities')
