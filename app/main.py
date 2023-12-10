@@ -1,13 +1,9 @@
 from fastapi import FastAPI
 
+from app.routes.city import router as city_router
+from app.routes.weather import router as weather_router
+
 app = FastAPI()
-# TODO: add dramatiq for automatic refresh weather each 5 minutes
 
-@app.get("/")
-async def root():
-    return {"message": "Hello World"}
-
-
-@app.get("/hello/{name}")
-async def say_hello(name: str):
-    return {"message": f"Hello {name}"}
+app.include_router(city_router)
+app.include_router(weather_router)
