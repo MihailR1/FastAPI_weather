@@ -36,6 +36,7 @@ class ConvertSchemaMixin:
         return city_schema
 
     async def convert_weather_response_to_scheme(self, response) -> WeatherSchema:
+        city = response['geo_object']['locality']['name']
         temperature = response['fact']['temp']
         feels_like = response['fact']['feels_like']
         pressure = response['fact']['pressure_mm']
@@ -49,6 +50,7 @@ class ConvertSchemaMixin:
              'pressure': pressure,
              'humidity': humidity,
              'wind_speed': wind_speed,
+                'city': city
              }
         )
 

@@ -18,6 +18,7 @@ class WeatherSchema(BaseModel):
     pressure: float
     humidity: float
     wind_speed: float
+    city: str
 
     class Config:
         from_attributes = True
