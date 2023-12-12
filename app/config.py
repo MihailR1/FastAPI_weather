@@ -19,7 +19,7 @@ class Settings(BaseSettings):
     LOG_LEVEL: str = 'INFO'
 
     @property
-    def DATABASE_URL(self):
+    def DATABASE_URL(self) -> str:
         return f'{self.DB_TYPE}+{self.DB_ENGINE}://{self.DB_LOGIN}:' \
                f'{self.DB_PASSWORD}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}'
 

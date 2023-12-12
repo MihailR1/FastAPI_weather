@@ -1,9 +1,11 @@
+from sqlalchemy import RowMapping
+
 from app.logger import logger
 from app.utils.crud import CityCRUD, WeatherCRUD
 from app.utils.schemas import CitySchema, WeatherSchema
 
 
-async def save_city_in_database(city: CitySchema) -> dict:
+async def save_city_in_database(city: CitySchema) -> RowMapping:
     find_in_db = await CityCRUD.find_by_name_and_region_or_none(
         name=city.name,
         region=city.region
@@ -19,7 +21,7 @@ async def save_city_in_database(city: CitySchema) -> dict:
     return find_in_db
 
 
-async def update_weather_in_db(city_id: int, weather: WeatherSchema):
+async def update_weather_in_db(city_id: int, weather: WeatherSchema) -> RowMapping:
     find_in_db = await WeatherCRUD.find_by_city_id_or_none(city_id)
     dumto_to_dict = WeatherSchema.model_dump(weather, mode='dict')
 

@@ -61,7 +61,7 @@ class Weather(ConvertSchemaMixin):
     limit = 3
 
     async def fetch_data(
-            self, url: str, header: Mapping[str, str], params: Mapping[str, str]):
+            self, url: str, header: Mapping[str, str], params: Mapping[str, str]) -> json:
 
         async with aiohttp.ClientSession(headers=header) as session:
             async with self.semaphor, session.get(url, params=params) as response:

@@ -11,7 +11,7 @@ class Base(DeclarativeBase):
     updated_at: Mapped[datetime] = mapped_column(
         server_default=sqlalchemy.text("TIMEZONE('utc', now())"), onupdate=datetime.utcnow)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f'{self.__class__.__name__} - id={self.id}'
 
 
