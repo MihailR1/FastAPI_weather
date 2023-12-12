@@ -8,9 +8,6 @@ class CitySchema(BaseModel):
     latitude: float
     longitude: float
 
-    class Config:
-        from_attributes = True
-
 
 class WeatherSchema(BaseModel):
     temperature: float
@@ -19,6 +16,3 @@ class WeatherSchema(BaseModel):
     humidity: float
     wind_speed: float
     city: str
-
-    class Config:
-        from_attributes = True
