@@ -1,22 +1,16 @@
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    DB_ENGINE: str
-    DB_TYPE: str
-    DB_LOGIN: str
-    DB_PASSWORD: str
-    DB_HOST: str
-    DB_PORT: int
-    DB_NAME: str
-    LOG_LEVEL: str
+    YANDEX_WEATHER_API_KEY: str
+    YANDEX_WEATHER_URL: str = 'https://api.weather.yandex.ru/v2/forecast'
+    YANDEX_GEOCODER_API_KEY: str
+    YANDEX_GEOCODER_URL: str = 'https://geocode-maps.yandex.ru/1.x'
+    YANDEX_API_LIMITS: int = 10
 
-    @property
-    def DATABASE_URL(self):
-        return f'{self.DB_TYPE}+{self.DB_ENGINE}://{self.DB_LOGIN}:{self.DB_PASSWORD}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}'
+    LOG_LEVEL: str = 'INFO'
 
-    class Config:
-        env_file = ".env"
+    model_config = SettingsConfigDict(env_file='.env', extra='ignore')
 
 
 settings = Settings()
