@@ -1,8 +1,6 @@
 FROM python:3.11-alpine
 
-RUN mkdir /new_app
-
-WORKDIR . /new_app
+WORKDIR /new_app
 
 RUN apk update && apk add --no-cache --virtual bash git gcc g++
 
