@@ -1,11 +1,11 @@
-# Сервис получения погоды по названию города любой страны мира
-Для работы нужно получить 2 API ключа по адресу https://developer.tech.yandex.ru/services
+# Сервис на FastAPI получения Яндекс-погоды по названию города любой страны мира
+Для работы нужно получить и прописать их в .env 2 API ключа по адресу https://developer.tech.yandex.ru/services
 ```
-JavaScript API и HTTP Геокодер
-API Яндекс.Погоды  
+JavaScript API и HTTP Геокодер - YANDEX_GEOCODER_API_KEY в env. файле
+API Яндекс.Погоды - YANDEX_WEATHER_API_KEY
 ```  
 
-## Запуск приложения
+## Запуск приложения через консоль
 Для запуска FastAPI используется веб-сервер uvicorn. Команда для запуска выглядит так:  
 ```
 uvicorn app.main:app --reload
@@ -16,3 +16,22 @@ uvicorn app.main:app --reload
 ```
 http://127.0.0.1:8000/docs
 ```
+
+## Запуск приложения через Docker
+
+1. Сборка образа 
+```
+docker build --tag weather .
+```
+
+2. Запуск образа с параметрами
+```
+docker run --env-file=.env -p 80:80 weather
+```
+
+3. Зайти на адрес со всеми роутами
+```
+http://127.0.0.1:80/docs
+```
+
+4. Проверить работоспобность вызвав любой из роутов
