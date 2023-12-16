@@ -1,4 +1,4 @@
-from typing import Mapping
+from typing import Mapping, Type
 
 import pydantic
 from pydantic import ValidationError
@@ -7,7 +7,8 @@ from app.utils.exceptions import ValidationSchemaError
 from app.utils.logger import logger
 
 
-async def validate_response_to_schema(schema: pydantic.BaseModel, response: Mapping[str, str]) -> pydantic.BaseModel:
+async def validate_response_to_schema(
+        schema: Type[pydantic.BaseModel], response: Mapping[str, str]) -> pydantic.BaseModel:
     try:
         convert_to_schema = schema.model_validate(response)
     except ValidationError as error:

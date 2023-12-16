@@ -1,6 +1,4 @@
-from pydantic import AliasChoices, AliasPath, BaseModel, Field, GetPydanticSchema
-from pydantic_core import core_schema
-from typing_extensions import Annotated
+from pydantic import AliasChoices, AliasPath, BaseModel, Field, computed_field
 
 
 class CitySchema(BaseModel):
@@ -27,23 +25,17 @@ class CitySchema(BaseModel):
                   )
     ))
     name: str = Field(validation_alias=AliasPath('name'))
-    latitude: Annotated[
-        str,
-        GetPydanticSchema(
-            lambda tp, handler: core_schema.no_info_after_validator_function(
-                lambda x: float(x.split()[1]), handler(tp)
-            )
-        ),
-    ] = Field(validation_alias=AliasPath('Point', 'pos'))
+    geo_position: str = Field(exclude=True, validation_alias=AliasPath('Point', 'pos'))
 
-    longitude: Annotated[
-        str,
-        GetPydanticSchema(
-            lambda tp, handler: core_schema.no_info_after_validator_function(
-                lambda x: float(x.split()[0]), handler(tp)
-            )
-        ),
-    ] = Field(validation_alias=AliasPath('Point', 'pos'))
+    @computed_field
+    @property
+    def latitude(self) -> float:
+        return float(self.geo_position.split()[1])
+
+    @computed_field
+    @property
+    def longitude(self) -> float:
+        return float(self.geo_position.split()[0])
 
 
 class WeatherSchema(BaseModel):

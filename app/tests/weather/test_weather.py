@@ -18,8 +18,8 @@ async def test__get_weather_by_city_geo__valid_geocoordinates(lat, lon, city):
     result: WeatherSchema = await get_weather_by_city_geo(lat, lon)
 
     assert result.city == city
-    assert result.temperature
-    assert result.humidity
+    assert result.temperature is not None
+    assert result.humidity is not None
 
 
 @pytest.mark.parametrize(
@@ -37,8 +37,8 @@ async def test__get_weather_by_city_geo__wrong_geocoordinates(lat, lon):
 async def test__get_weather_by_city_name__valid__cities_names(city):
     result: WeatherSchema = await get_weather_by_city_name(city)
 
-    assert result.temperature
-    assert result.humidity
+    assert result.temperature is not None
+    assert result.humidity is not None
 
 
 @pytest.mark.parametrize(
