@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from app.schemas.schemas import CitySchema, WeatherSchema
+from app.schemas.response_schemas import CitySchema, WeatherSchema
 from app.services.weather import weather
 
 router = APIRouter(prefix="/weather", tags=["Погода"])
@@ -27,9 +27,8 @@ async def get_weather_by_city_name(name: str = 'Moscow') -> WeatherSchema:
 
     city_geo_data: CitySchema = await weather.get_city_geo_by_name(name)
 
-    # #city_weather: WeatherSchema = await get_weather_by_city_geo(
-    #     city_geo_data.latitude,
-    #     city_geo_data.longitude
-    # )
-
-    #return city_weather
+    city_weather: WeatherSchema = await get_weather_by_city_geo(
+        city_geo_data.latitude,
+        city_geo_data.longitude
+    )
+    return city_weather
