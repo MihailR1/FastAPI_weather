@@ -3,10 +3,11 @@ from asyncio import Semaphore
 from typing import Mapping
 
 import aiohttp
+from starlette import status
 
 from app.config import settings
-from app.exceptions import ConnectionToAPIError, WrongCity
-from app.utils.schemas import CitySchema, WeatherSchema
+from app.utils.exceptions import ConnectionToAPIError, WrongCity
+from app.schemas.schemas import CitySchema, WeatherSchema
 
 
 class ConvertSchemaMixin:
@@ -67,7 +68,7 @@ class Weather(ConvertSchemaMixin):
 
         async with aiohttp.ClientSession(headers=header) as session:
             async with self.semaphor, session.get(url, params=params) as response:
-                if response.status == 200:
+                if response.status == status.HTTP_200_OK:
                     result = json.loads(await response.text())
                     return result
                 else:

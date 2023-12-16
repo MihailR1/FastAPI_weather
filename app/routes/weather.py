@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 
-from app.utils.schemas import CitySchema, WeatherSchema
-from app.utils.weather import weather
+from app.schemas.schemas import CitySchema, WeatherSchema
+from app.services.weather import weather
 
 router = APIRouter(prefix="/weather", tags=["Погода"])
 

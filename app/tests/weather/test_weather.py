@@ -1,8 +1,8 @@
 import pytest
 
-from app.exceptions import ConnectionToAPIError, WrongCity
+from app.utils.exceptions import ConnectionToAPIError, WrongCity
 from app.routes.weather import get_weather_by_city_geo, get_weather_by_city_name
-from app.utils.schemas import WeatherSchema
+from app.schemas.schemas import WeatherSchema
 
 
 @pytest.mark.parametrize(
