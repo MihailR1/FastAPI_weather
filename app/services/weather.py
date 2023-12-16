@@ -1,13 +1,15 @@
 import json
 from asyncio import Semaphore
-from typing import Mapping
+from typing import Mapping, Generic, Any
 
 import aiohttp
-from starlette import status
+from fastapi import status
+from pydantic import ValidationError, BaseModel
 
 from app.config import settings
 from app.utils.exceptions import ConnectionToAPIError, WrongCity
 from app.schemas.schemas import CitySchema, WeatherSchema
+from app.utils.logger import logger
 
 
 class ConvertSchemaMixin:
@@ -36,27 +38,6 @@ class ConvertSchemaMixin:
 
         return city_schema
 
-    async def convert_weather_response_to_scheme(self, response) -> WeatherSchema:
-        city = response['geo_object']['locality']['name']
-        temperature = response['fact']['temp']
-        feels_like = response['fact']['feels_like']
-        pressure = response['fact']['pressure_mm']
-        humidity = response['fact']['humidity']
-        wind_speed = response['fact']['wind_speed']
-
-        weather_scheme: WeatherSchema = WeatherSchema.model_validate(
-            {
-             'temperature': temperature,
-             'feels_like': feels_like,
-             'pressure': pressure,
-             'humidity': humidity,
-             'wind_speed': wind_speed,
-                'city': city
-             }
-        )
-
-        return weather_scheme
-
 
 class Weather(ConvertSchemaMixin):
     semaphor = Semaphore(settings.YANDEX_API_LIMITS)
@@ -72,7 +53,19 @@ class Weather(ConvertSchemaMixin):
                     result = json.loads(await response.text())
                     return result
                 else:
+                    logger.error(f'Ошибка при обращении к API Yandex, status: {response.status}, '
+                                 f'error: {json.loads(await response.text())["errors"]}')
                     raise ConnectionToAPIError
+
+    @staticmethod
+    async def validate_response_to_schema(schema: Any, response: Mapping[str, str]):
+        try:
+            convert_to_schema = schema.model_validate(response)
+        except (IndexError, TypeError, KeyError, ValidationError) as error:
+            logger.error(f'Ошибка при валидации данных. error: {error}')
+            raise WrongCity
+
+        return convert_to_schema
 
     async def get_weather_data(self, lat, lon) -> WeatherSchema:
         header = {'X-Yandex-API-Key': settings.YANDEX_WEATHER_API_KEY}
@@ -85,12 +78,8 @@ class Weather(ConvertSchemaMixin):
                   }
 
         response = await self.fetch_data(settings.YANDEX_WEATHER_URL, header=header, params=params)
-        try:
-            convert_to_schema: WeatherSchema = await self.convert_weather_response_to_scheme(response)
-        except (IndexError, TypeError, KeyError):
-            raise WrongCity
 
-        return convert_to_schema
+        return await self.validate_response_to_schema(WeatherSchema, response)
 
     async def get_city_geo_by_name(self, name) -> CitySchema:
         url = settings.YANDEX_GEOCODER_URL
@@ -98,18 +87,18 @@ class Weather(ConvertSchemaMixin):
         params = {
             'apikey': settings.YANDEX_GEOCODER_API_KEY,
             'geocode': name,
-            'result': 1,
+            'result': self.limit,
             'lang': self.lang,
             'format': 'json'
                   }
 
         response = await self.fetch_data(url, header, params)
-        try:
-            convert_to_schema: CitySchema = await self.convert_city_response_to_scheme(response)
-        except (IndexError, TypeError, KeyError):
-            raise WrongCity
+        main_response_body = response['response']['GeoObjectCollection']['featureMember'][0]['GeoObject']
+        print(CitySchema.model_json_schema())
+        result = await self.validate_response_to_schema(CitySchema, main_response_body)
+        print(result)
 
-        return convert_to_schema
+        return None
 
 
 weather: Weather = Weather()

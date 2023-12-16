@@ -22,7 +22,7 @@ class CustomJsonFormatter(jsonlogger.JsonFormatter):
 
 
 formatter = CustomJsonFormatter(
-    "%(timestamp)s %(level)s %(message)s %(module)s %(funcName)s"
+    "%(timestamp)s %(level)s %(message)s %(module)s %(funcName)s", json_ensure_ascii=False
 )
 
 logHandler.setFormatter(formatter)
