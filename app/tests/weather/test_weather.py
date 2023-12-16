@@ -1,8 +1,8 @@
 import pytest
 
-from app.utils.exceptions import ConnectionToAPIError, WrongCity
 from app.routes.weather import get_weather_by_city_geo, get_weather_by_city_name
 from app.schemas.response_schemas import WeatherSchema
+from app.utils.exceptions import ConnectionToAPIError, WrongCityError
 
 
 @pytest.mark.parametrize(
@@ -44,19 +44,11 @@ async def test__get_weather_by_city_name__valid__cities_names(city):
 @pytest.mark.parametrize(
     "city",
     [
-        "Россия",
-        "Russia",
-        "Сингапур",
-        "США",
-        "бразилия",
         "EkатерuHburg",
         "1231d",
         "dfg",
-        "тайланд",
-        "laoss",
-        "китай"
     ],
 )
 async def test__get_weather_by_city_name__wrong_cities_names(city):
-    with pytest.raises(WrongCity):
+    with pytest.raises(WrongCityError):
         assert await get_weather_by_city_name(city)

@@ -1,4 +1,4 @@
-from pydantic import BaseModel, GetPydanticSchema, Field, AliasPath, AliasChoices
+from pydantic import AliasChoices, AliasPath, BaseModel, Field, GetPydanticSchema
 from pydantic_core import core_schema
 from typing_extensions import Annotated
 
@@ -20,7 +20,11 @@ class CitySchema(BaseModel):
             'AdministrativeArea',
             'AdministrativeAreaName'
         ),
-        AliasPath('description')
+        AliasPath('metaDataProperty',
+                  'GeocoderMetaData',
+                  'Address',
+                  'formatted'
+                  )
     ))
     name: str = Field(validation_alias=AliasPath('name'))
     latitude: Annotated[

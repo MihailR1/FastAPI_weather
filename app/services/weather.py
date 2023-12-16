@@ -6,9 +6,9 @@ import aiohttp
 from fastapi import status
 
 from app.config import settings
-from app.schemas.validate_schemas import validate_response_to_schema
-from app.utils.exceptions import ConnectionToAPIError
 from app.schemas.response_schemas import CitySchema, WeatherSchema
+from app.schemas.validate_schemas import validate_response_to_schema
+from app.utils.exceptions import ConnectionToAPIError, ValidationSchemaError, WrongCityError
 from app.utils.logger import logger
 
 
@@ -22,12 +22,14 @@ class Weather:
 
         async with aiohttp.ClientSession(headers=header) as session:
             async with self.semaphor, session.get(url, params=params) as response:
+                response_text = await response.text()
+
                 if response.status == status.HTTP_200_OK:
-                    result = json.loads(await response.text())
+                    result = json.loads(response_text)
                     return result
                 else:
                     logger.error(f'Ошибка при обращении к API Yandex, status: {response.status}, '
-                                 f'error: {json.loads(await response.text())["errors"]}')
+                                 f'error: {response_text}')
                     raise ConnectionToAPIError
 
     async def get_weather_data(self, lat, lon) -> WeatherSchema:
@@ -41,8 +43,12 @@ class Weather:
                   }
 
         response = await self.fetch_data(settings.YANDEX_WEATHER_URL, header=header, params=params)
+        try:
+            result = await validate_response_to_schema(WeatherSchema, response)
+        except ValidationSchemaError:
+            raise WrongCityError
 
-        return await validate_response_to_schema(WeatherSchema, response)
+        return result
 
     async def get_city_geo_by_name(self, name) -> CitySchema:
         url = settings.YANDEX_GEOCODER_URL
@@ -56,8 +62,11 @@ class Weather:
                   }
 
         response = await self.fetch_data(url, header, params)
-        main_response_body = response['response']['GeoObjectCollection']['featureMember'][0]['GeoObject']
-        result = await validate_response_to_schema(CitySchema, main_response_body)
+        try:
+            main_response_body = response['response']['GeoObjectCollection']['featureMember'][0]['GeoObject']
+            result = await validate_response_to_schema(CitySchema, main_response_body)
+        except (IndexError, ValidationSchemaError):
+            raise WrongCityError
 
         return result
 
