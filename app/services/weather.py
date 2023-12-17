@@ -1,6 +1,6 @@
 import json
 from asyncio import Semaphore
-from typing import Mapping
+from typing import Mapping, Any
 
 import aiohttp
 from fastapi import status
@@ -18,7 +18,10 @@ class Weather:
     limit = 3
 
     async def fetch_data(
-            self, url: str, header: Mapping[str, str], params: Mapping[str, str]) -> json:
+            self,
+            url: str,
+            header: Mapping[str, str],
+            params: Mapping[str, str | int]) -> Mapping[str, Any]:
 
         async with aiohttp.ClientSession(headers=header) as session:
             async with self.semaphor, session.get(url, params=params) as response:
@@ -32,7 +35,7 @@ class Weather:
                                  f'error: {response_text}')
                     raise ConnectionToAPIError
 
-    async def get_weather_data(self, lat, lon) -> WeatherSchema:
+    async def get_weather_data(self, lat: float, lon: float) -> WeatherSchema:
         header = {'X-Yandex-API-Key': settings.YANDEX_WEATHER_API_KEY}
         params = {'lat': lat,
                   'lon': lon,
@@ -50,7 +53,7 @@ class Weather:
 
         return result
 
-    async def get_city_geo_by_name(self, name) -> CitySchema:
+    async def get_city_geo_by_name(self, name: str) -> CitySchema:
         url = settings.YANDEX_GEOCODER_URL
         header = {}
         params = {
@@ -62,6 +65,7 @@ class Weather:
                   }
 
         response = await self.fetch_data(url, header, params)
+
         try:
             main_response_body = response['response']['GeoObjectCollection']['featureMember'][0]['GeoObject']
             result = await validate_response_to_schema(CitySchema, main_response_body)
