@@ -14,6 +14,11 @@ class ConnectionToAPIError(BaseEx):
     detail = 'Ошибка при обращении к внешнему API'
 
 
-class WrongCity(BaseEx):
+class WrongCityError(BaseEx):
     status_code = status.HTTP_404_NOT_FOUND
     detail = 'Пользователь ввел не существующий город'
+
+
+class ValidationSchemaError(BaseEx):
+    status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+    detail = 'Ошибка валидации данных'

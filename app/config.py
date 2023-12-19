@@ -1,3 +1,5 @@
+import os
+
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -9,8 +11,10 @@ class Settings(BaseSettings):
     YANDEX_API_LIMITS: int = 10
 
     LOG_LEVEL: str = 'INFO'
+    BASEDIR: str = os.path.abspath(os.path.dirname(__file__))
+    ENV_FILE_PATH: str = os.path.join(BASEDIR, '..', '.env')
 
-    model_config = SettingsConfigDict(env_file='.env', extra='ignore')
+    model_config = SettingsConfigDict(env_file=ENV_FILE_PATH, extra='ignore')
 
 
 settings = Settings()
